@@ -59,7 +59,7 @@ NSNotificationCenter *proximityObserver;
             device.proximityMonitoringEnabled = [arguments[@"enabled"] boolValue];
 
             // Return if proximityListener is currently enabled. 
-            result([NSNumber numberWithBool: device.proximityMonitoringEnabled]);
+            result(nil);
         } else if ([method isEqualToString:@"toggleScreenOnProximityChanged"]) {
             // Does not work on iOS.
         } else {
