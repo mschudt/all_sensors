@@ -60,6 +60,8 @@ NSNotificationCenter *proximityObserver;
 
             // Return if proximityListener is currently enabled. 
             result([NSNumber numberWithBool: device.proximityMonitoringEnabled]);
+        } else if ([method isEqualToString:@"toggleScreenOnProximityChanged"]) {
+            // Does not work on iOS.
         } else {
           result(FlutterMethodNotImplemented);
         }
