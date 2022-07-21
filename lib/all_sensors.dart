@@ -12,6 +12,9 @@ const EventChannel _gyroscopeEventChannel = EventChannel('cindyu.com/all_sensors
 
 const EventChannel _proximityEventChannel = EventChannel('cindyu.com/all_sensors/proximity');
 
+const MethodChannel _methodChannel = EventChannel('cindyu.com/all_sensors');
+
+
 class AccelerometerEvent {
   /// Acceleration force along the x axis (including gravity) measured in m/s^2.
   final double x;
@@ -134,4 +137,23 @@ Stream<ProximityEvent>? get proximityEvents {
       .map((dynamic event) => _listToProximityEvent(event.cast<double>()));
 
   return _proximityEvents;
+}
+
+
+
+/// Select if the plugin listens for proximity events.
+/// When enabled, this always automatically toggles the screen on iOS. 
+Future<void> toggleProximityListener(bool enabled) {
+  return _methodChannel.invokeMethod<void>(
+    'toggleProximityListener',
+    <String, dynamic>{'enabled': enabled},
+  );
+}
+
+/// Android only. Select if the screen is automatically turned on/off when the proximity changes.
+Future<void> toggleScreenOnProximityChanged(bool enabled) {
+  return _methodChannel.invokeMethod<void>(
+    'toggleScreenOnProximityChanged',
+    <String, dynamic>{'enabled': enabled},
+  );
 }
