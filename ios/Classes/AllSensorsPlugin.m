@@ -46,6 +46,24 @@ NSNotificationCenter *proximityObserver;
         [userAccelerometerChannel setStreamHandler:userAccelerometerStreamHandler];
         [gyroscopeChannel setStreamHandler:gyroscopeStreamHandler];
     }
+
+    FlutterMethodChannel *methodChannel = [FlutterMethodChannel methodChannelWithName:@"cindyu.com/all_sensors"
+                                                              binaryMessenger:registrar.messenger];
+
+    [methodChannel setMethodCallHandler:^(FlutterMethodCall *call, FlutterResult result) {
+        NSString *method = [call method];
+        NSDictionary *arguments = [call arguments];
+
+        if ([method isEqualToString:@"toggleProximityListener"]) {
+            UIDevice *device = [UIDevice currentDevice];
+            device.proximityMonitoringEnabled = [arguments[@"enabled"] boolValue];
+
+            // Return if proximityListener is currently enabled. 
+            result([NSNumber numberWithBool: device.proximityMonitoringEnabled]);
+        } else {
+          result(FlutterMethodNotImplemented);
+        }
+      }];
 }
 
 @end
