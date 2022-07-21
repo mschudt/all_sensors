@@ -20,7 +20,9 @@ public class StreamHandlerImpl implements EventChannel.StreamHandler{
     private static int field = 0x00000020;
     private boolean onCancelCalled = false;
     private boolean far = true;
-
+    private boolean proximityListenerEnabled = true;
+    private boolean toggleScreenOnProximityChanged = true;
+    
     public StreamHandlerImpl(SensorManager sensorManager, int sensorType) {
         this.sensorManager = sensorManager;
         sensor = sensorManager.getDefaultSensor(sensorType);
@@ -32,6 +34,7 @@ public class StreamHandlerImpl implements EventChannel.StreamHandler{
         try {
             field = PowerManager.class.getField("PROXIMITY_SCREEN_OFF_WAKE_LOCK").getInt(null);
         } catch (Throwable ignored) {}
+
         this.wakeLock = powerManager.newWakeLock(field, "AllSensors::Wakelock");
     }
 
@@ -61,8 +64,15 @@ public class StreamHandlerImpl implements EventChannel.StreamHandler{
                     sensorValues[i] = event.values[i];
                 }
                 if (event.sensor.getType() == Sensor.TYPE_PROXIMITY) {
-                    if(onCancelCalled && far) sensorManager.unregisterListener(this);
-                    else setWakeLock(sensorValues[0]);
+                    // Don't send event when proximityListenerEnabled is false.
+                    if(!proximityListenerEnabled){
+                        return;
+                    }
+
+                    if (onCancelCalled && far)
+                        sensorManager.unregisterListener(this);
+                    else
+                        setWakeLock(sensorValues[0]);
                 }
                 events.success(sensorValues);
 
@@ -74,14 +84,36 @@ public class StreamHandlerImpl implements EventChannel.StreamHandler{
         try {
             if (value == 0) {
                 far = false;
-                wakeLock.acquire();
-            }
-            else if (wakeLock.isHeld()) {
+                if (this.toggleScreenOnProximityChanged) {
+                    wakeLock.acquire();
+                }
+            } else {
                 far = true;
-                wakeLock.release();
+                if (this.toggleScreenOnProximityChanged && wakeLock.isHeld()) {
+                    wakeLock.release();
+                }
             }
         }catch (Exception e) {
             e.printStackTrace();
         }
     }
+
+    public void setProximityListenerEnabled(boolean enabled) {
+        if (enabled == this.proximityListenerEnabled){
+            return;
+        }
+        
+        if (enabled) {
+            sensorManager.registerListener(sensorEventListener, sensor, sensorManager.SENSOR_DELAY_NORMAL);
+        } else {
+            sensorManager.unregisterListener(sensorEventListener);
+        }
+
+        this.proximityListenerEnabled = enabled;
+    }
+
+    public void setToggleScreenOnProximityChanged(boolean enabled) {
+        this.toggleScreenOnProximityChanged = enabled;
+    }
+    
 }
