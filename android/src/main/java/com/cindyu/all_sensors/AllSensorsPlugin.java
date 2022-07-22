@@ -10,14 +10,14 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import static android.content.Context.POWER_SERVICE;
+
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.embedding.android.FlutterActivity;
 import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.EventChannel;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
 import io.flutter.plugin.common.MethodChannel;
-
-import static android.content.Context.POWER_SERVICE;
 
 /** AllSensorsPlugin */
 public class AllSensorsPlugin implements FlutterPlugin {
@@ -64,7 +64,7 @@ public class AllSensorsPlugin implements FlutterPlugin {
     proximityChannel.setStreamHandler(proximityStreamHandler);
 
     methodChannel = new MethodChannel(messenger, METHOD_CHANNELNAME);
-    methodChannel.setMethodCallHandler(new MethodCallHandlerImpl());
+    methodChannel.setMethodCallHandler(new MethodCallHandlerImpl(proximityStreamHandler));
   }
 
   @Override

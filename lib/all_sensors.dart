@@ -12,7 +12,7 @@ const EventChannel _gyroscopeEventChannel = EventChannel('cindyu.com/all_sensors
 
 const EventChannel _proximityEventChannel = EventChannel('cindyu.com/all_sensors/proximity');
 
-const MethodChannel _methodChannel = EventChannel('cindyu.com/all_sensors');
+const MethodChannel _methodChannel = MethodChannel('cindyu.com/all_sensors');
 
 
 class AccelerometerEvent {
